@@ -4,12 +4,12 @@ kumuluzee:
     name: dev
   version: 1.0.0
   server:
-    base-url: http://localhost:8081
+    base-url: http://localhost:8080
     http:
-      port: 8081
+      port: 8080
   datasources:
-  - jndi-name: jdbc/OrdersDS
-    connection-url: jdbc:postgresql:/localhost/192.168.99.100:5433/user #TODO check this
+  - jndi-name: jdbc/UserDS
+    connection-url: jdbc:postgresql://192.168.99.100:5432/user #TODO check this
     username: dbuser
     password: postgres
     max-pool-size: 20
