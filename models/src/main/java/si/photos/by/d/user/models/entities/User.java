@@ -1,8 +1,11 @@
 package si.photos.by.d.user.models.entities;
 
 
+import si.photos.by.d.user.models.dtos.Photo;
+
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 
 @Entity(name = "my_user")
 @NamedQueries(value =
@@ -28,6 +31,9 @@ public class User {
 
     @Column(name = "date_of_birth")
     private Instant dateOfBirth;
+
+    @Transient
+    private List<Photo> photos;
 
     public Integer getId() {
         return id;
@@ -75,5 +81,13 @@ public class User {
 
     public void setDateOfBirth(Instant dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public List<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Photo> photos) {
+        this.photos = photos;
     }
 }

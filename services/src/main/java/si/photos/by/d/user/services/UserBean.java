@@ -2,6 +2,7 @@ package si.photos.by.d.user.services;
 
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
+import si.photos.by.d.user.models.dtos.Photo;
 import si.photos.by.d.user.models.entities.User;
 
 import javax.annotation.PostConstruct;
@@ -9,9 +10,13 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.logging.Logger;
@@ -32,6 +37,7 @@ public class UserBean {
 
     @PostConstruct
     private void init() {
+        // This here will connect to photo service and get me photos for user
         httpClient = ClientBuilder.newClient();
         baseUrl = "http://localhost:8081"; // only for demonstration
     }
@@ -56,6 +62,9 @@ public class UserBean {
             throw new NotFoundException();
         }
 
+        List<Photo> photos = getPhotosForUser(userId);
+        user.setPhotos(photos);
+
         return user;
     }
 
@@ -65,9 +74,10 @@ public class UserBean {
             em.persist(user);
             commitTx();
         } catch (Exception e) {
+            log.warning("There was a problem with saving new user with email " + user.getEmail());
             rollbackTx();
         }
-
+        log.info("Successfully saved new user with email " + user.getEmail());
         return user;
     }
 
@@ -82,9 +92,10 @@ public class UserBean {
             em.merge(user);
             commitTx();
         } catch (Exception e) {
+            log.warning("There was a problem with updating user with email " + user.getEmail());
             rollbackTx();
         }
-
+        log.info("Successfully updated user with email " + user.getEmail());
         return user;
     }
 
@@ -119,6 +130,17 @@ public class UserBean {
     private void rollbackTx() {
         if (em.getTransaction().isActive())
             em.getTransaction().rollback();
+    }
+
+    private List<Photo> getPhotosForUser(Integer userId) {
+        try {
+            return httpClient
+                    .target(baseUrl + "/v1/photos?where=userId:EQ:" + userId)
+                    .request().get(new GenericType<List<Photo>>() {});
+        } catch (WebApplicationException | ProcessingException e) {
+            log.severe(e.getMessage());
+            throw new InternalServerErrorException(e);
+        }
     }
 
 }
