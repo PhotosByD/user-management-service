@@ -22,6 +22,8 @@
 
         <kumuluzee.version>3.0.0</kumuluzee.version>
         <kumuluzee-rest.version>1.2.3</kumuluzee-rest.version>
+        <kumuluzee-config.version>1.1.0</kumuluzee-config.version>
+        <kumuluzee-discovery.version>1.1.0</kumuluzee-discovery.version>
 
         <postgresql.version>42.2.5</postgresql.version>
     </properties>
@@ -34,6 +36,16 @@
                 <version>${kumuluzee.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <artifactId>kumuluzee-config-etcd</artifactId>
+                <groupId>com.kumuluz.ee.config</groupId>
+                <version>${kumuluzee-config.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.kumuluz.ee.discovery</groupId>
+                <artifactId>kumuluzee-discovery-etcd</artifactId>
+                <version>${kumuluzee-discovery.version}</version>
             </dependency>
 
             <dependency>

@@ -1,8 +1,7 @@
 package si.photos.by.d.user.api.v1.resources;
 
-import jdk.nashorn.internal.objects.annotations.Getter;
 import si.photos.by.d.user.models.entities.User;
-import si.photos.by.d.user.services.UserBean;
+import si.photos.by.d.user.services.beans.UserBean;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

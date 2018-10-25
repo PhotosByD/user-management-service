@@ -1,9 +1,11 @@
-package si.photos.by.d.user.services;
+package si.photos.by.d.user.services.beans;
 
+import com.kumuluz.ee.discovery.annotations.DiscoverService;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
 import si.photos.by.d.user.models.dtos.Photo;
 import si.photos.by.d.user.models.entities.User;
+import si.photos.by.d.user.services.configuration.AppProperties;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
@@ -19,6 +21,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @RequestScoped
@@ -31,15 +34,20 @@ public class UserBean {
     @Inject
     private UserBean userBean;
 
+    @Inject
+    private AppProperties appProperties;
+
     private Client httpClient;
 
-    private String baseUrl;
+    @Inject
+    @DiscoverService("photo-management-service")
+    private Optional<String> baseUrl;
 
     @PostConstruct
     private void init() {
         // This here will connect to photo service and get me photos for user
         httpClient = ClientBuilder.newClient();
-        baseUrl = "http://localhost:8081"; // only for demonstration
+        //baseUrl = "http://localhost:8081"; // only for demonstration
     }
 
     public List<User> getUsers() {
@@ -135,12 +143,14 @@ public class UserBean {
     private List<Photo> getPhotosForUser(Integer userId) {
         try {
             return httpClient
-                    .target(baseUrl + "/v1/photos?where=userId:EQ:" + userId)
+                    .target(baseUrl.get() + "/v1/photos?where=userId:EQ:" + userId)
                     .request().get(new GenericType<List<Photo>>() {});
         } catch (WebApplicationException | ProcessingException e) {
             log.severe(e.getMessage());
             throw new InternalServerErrorException(e);
         }
+
+
     }
 
 }
