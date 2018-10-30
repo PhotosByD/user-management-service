@@ -66,7 +66,7 @@ public class UserBean {
     public User getUser(Integer userId) {
         User user = em.find(User.class, userId);
 
-        if(user == null) {
+        if (user == null) {
             throw new NotFoundException();
         }
 
@@ -77,7 +77,7 @@ public class UserBean {
     }
 
     public User createUser(User user) {
-        try{
+        try {
             beginTx();
             em.persist(user);
             commitTx();
@@ -92,7 +92,7 @@ public class UserBean {
     public User updateUser(Integer userId, User user) {
         User u = em.find(User.class, userId);
 
-        if(u == null) return null;
+        if (u == null) return null;
 
         try {
             beginTx();
@@ -110,7 +110,7 @@ public class UserBean {
     public boolean deleteUser(Integer userId) {
         User user = em.find(User.class, userId);
 
-        if(user != null) {
+        if (user != null) {
             try {
                 beginTx();
                 em.remove(user);
@@ -141,16 +141,18 @@ public class UserBean {
     }
 
     private List<Photo> getPhotosForUser(Integer userId) {
-        try {
-            return httpClient
-                    .target(baseUrl.get() + "/v1/photos?where=userId:EQ:" + userId)
-                    .request().get(new GenericType<List<Photo>>() {});
-        } catch (WebApplicationException | ProcessingException e) {
-            log.severe(e.getMessage());
-            throw new InternalServerErrorException(e);
+        if (appProperties.isExternalServicesEnabled() && baseUrl.isPresent()) {
+            try {
+                return httpClient
+                        .target(baseUrl.get() + "/v1/photos?where=userId:EQ:" + userId)
+                        .request().get(new GenericType<List<Photo>>() {
+                        });
+            } catch (WebApplicationException | ProcessingException e) {
+                log.severe(e.getMessage());
+                throw new InternalServerErrorException(e);
+            }
         }
-
-
+        return null;
     }
 
 }

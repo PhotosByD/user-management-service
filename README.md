@@ -8,13 +8,19 @@ docker run -d --name pg-users -e POSTGRES_USER=dbuser -e POSTGRES_PASSWORD=postg
 
 ##ETCD
 export HostIP="192.168.99.100"
-docker run -d -v /usr/share/ca-certificates/:/etc/ssl/certs -p 4001:4001 -p 2380:2380 -p 2379:2379 \
- --name etcd quay.io/coreos/etcd:v2.3.8 \
- -name etcd0 \
- -advertise-client-urls http://${HostIP}:2379,http://${HostIP}:4001 \
- -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 \
- -initial-advertise-peer-urls http://${HostIP}:2380 \
- -listen-peer-urls http://0.0.0.0:2380 \
- -initial-cluster-token etcd-cluster-1 \
- -initial-cluster etcd0=http://${HostIP}:2380 \
- -initial-cluster-state new
+docker run -d -p 2379:2379 \
+   --name etcd \
+   --volume=/tmp/etcd-data:/etcd-data \
+   quay.io/coreos/etcd:latest \
+   /usr/local/bin/etcd \
+   --name my-etcd-1 \
+   --data-dir /etcd-data \
+   --listen-client-urls http://0.0.0.0:2379 \
+   --advertise-client-urls http://0.0.0.0:2379 \
+   --listen-peer-urls http://0.0.0.0:2380 \
+   --initial-advertise-peer-urls http://0.0.0.0:2380 \
+   --initial-cluster my-etcd-1=http://0.0.0.0:2380 \
+   --initial-cluster-token my-etcd-token \
+   --initial-cluster-state new \
+   --auto-compaction-retention 1 \
+   -cors="*"

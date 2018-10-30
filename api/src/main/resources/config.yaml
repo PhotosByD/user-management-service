@@ -22,4 +22,4 @@ kumuluzee:
       hosts: http://192.168.99.100:2379
 app-properties:
   external-services:
-    enabled: true
+    enabled: false
