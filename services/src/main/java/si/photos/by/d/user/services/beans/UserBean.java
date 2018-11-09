@@ -3,6 +3,7 @@ package si.photos.by.d.user.services.beans;
 import com.kumuluz.ee.discovery.annotations.DiscoverService;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
+import si.photos.by.d.user.models.dtos.Album;
 import si.photos.by.d.user.models.dtos.Photo;
 import si.photos.by.d.user.models.entities.User;
 import si.photos.by.d.user.services.configuration.AppProperties;
@@ -41,13 +42,17 @@ public class UserBean {
 
     @Inject
     @DiscoverService("photo-management-service")
-    private Optional<String> baseUrl;
+    private Optional<String> photoUrl;
+
+    @Inject
+    @DiscoverService("album-management-service")
+    private Optional<String> albumUrl;
 
     @PostConstruct
     private void init() {
         // This here will connect to photo service and get me photos for user
         httpClient = ClientBuilder.newClient();
-        //baseUrl = "http://localhost:8081"; // only for demonstration
+        //photoUrl = "http://localhost:8081"; // only for demonstration
     }
 
     public List<User> getUsers() {
@@ -72,6 +77,9 @@ public class UserBean {
 
         List<Photo> photos = getPhotosForUser(userId);
         user.setPhotos(photos);
+
+        List<Album> albums = getAlbumsForUser(userId);
+        user.setAlbums(albums);
 
         return user;
     }
@@ -141,11 +149,26 @@ public class UserBean {
     }
 
     private List<Photo> getPhotosForUser(Integer userId) {
-        if (appProperties.isExternalServicesEnabled() && baseUrl.isPresent()) {
+        if (appProperties.isExternalServicesEnabled() && photoUrl.isPresent()) {
             try {
                 return httpClient
-                        .target(baseUrl.get() + "/v1/photos?where=userId:EQ:" + userId)
+                        .target(photoUrl.get() + "/v1/photos?where=userId:EQ:" + userId)
                         .request().get(new GenericType<List<Photo>>() {
+                        });
+            } catch (WebApplicationException | ProcessingException e) {
+                log.severe(e.getMessage());
+                throw new InternalServerErrorException(e);
+            }
+        }
+        return null;
+    }
+
+    private List<Album> getAlbumsForUser(Integer userId) {
+        if (albumUrl.isPresent()) {
+            try {
+                return httpClient
+                        .target(albumUrl.get() + "/v1/albums/user/" + userId)
+                        .request().get(new GenericType<List<Album>>() {
                         });
             } catch (WebApplicationException | ProcessingException e) {
                 log.severe(e.getMessage());
