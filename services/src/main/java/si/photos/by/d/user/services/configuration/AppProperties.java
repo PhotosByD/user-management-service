@@ -11,7 +11,7 @@ public class AppProperties {
     @ConfigValue(value = "external-services.enabled", watch = true)
     private boolean externalServicesEnabled;
 
-    @ConfigValue(watch = true)
+    @ConfigValue(watch = true, value = "healthy")
     private boolean healthy;
 
     public boolean isExternalServicesEnabled() {

@@ -13,7 +13,7 @@ spec:
         app: user
     spec:
       containers:
-      - image: photosbyd/user-service:0.3
+      - image: photosbyd/user-service:0.4
         name: user
         env:
         - name: KUMULUZEE_DISCOVERY_CLUSTER
@@ -23,12 +23,16 @@ spec:
         - name: KUMULUZEE_CONFIG_ETCD_HOSTS
           value: http://etcd:2379
         - name: KUMULUZEE_SERVER_BASEURL
-          value: http://35.240.79.227:8080
+          value: http://159.122.187.8:32674
         - name: KUMULUZEE_DATASOURCES0_PASSWORD
           valueFrom:
             secretKeyRef:
               name: pg-pass
               key: KUMULUZEE_DATASOURCES0_PASSWORD
+        - name: KUMULUZEE_DATASOURCES0_USERNAME
+          value: admin
+        - name: KUMULUZEE_DATASOURCES0_CONNECTION-URL
+          value: jdbc:postgresql://sl-eu-gb-p02.dblayer.com:15881/compose
         ports:
         - containerPort: 8080
           name: server
@@ -47,7 +51,7 @@ kind: Service
 metadata:
   name: user
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
   - port: 8080
     protocol: TCP

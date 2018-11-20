@@ -30,3 +30,4 @@ kumuluzee:
 app-properties:
   external-services:
     enabled: false
+  healthy: true
