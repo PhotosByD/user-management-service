@@ -3,6 +3,7 @@ package si.photos.by.d.user.services.beans;
 import com.kumuluz.ee.discovery.annotations.DiscoverService;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import si.photos.by.d.user.models.dtos.Album;
 import si.photos.by.d.user.models.dtos.Photo;
 import si.photos.by.d.user.models.entities.User;
@@ -33,9 +34,6 @@ public class UserBean {
     private EntityManager em;
 
     @Inject
-    private UserBean userBean;
-
-    @Inject
     private AppProperties appProperties;
 
     private Client httpClient;
@@ -55,6 +53,7 @@ public class UserBean {
         //photoUrl = "http://localhost:8081"; // only for demonstration
     }
 
+    @Timed
     public List<User> getUsers() {
         TypedQuery<User> query = em.createNamedQuery("User.getAll", User.class);
         return query.getResultList();

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      containers:
+      - image: photosbyd/user-service:0.3
+        name: user
+        env:
+        - name: KUMULUZEE_DISCOVERY_CLUSTER
+          value: gcloud
+        - name: KUMULUZEE_DISCOVERY_ETCD_HOSTS
+          value: http://etcd:2379
+        - name: KUMULUZEE_CONFIG_ETCD_HOSTS
+          value: http://etcd:2379
+        - name: KUMULUZEE_SERVER_BASEURL
+          value: http://35.240.79.227:8080
+        - name: KUMULUZEE_DATASOURCES0_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pg-pass
+              key: KUMULUZEE_DATASOURCES0_PASSWORD
+        ports:
+        - containerPort: 8080
+          name: server
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: server
+          initialDelaySeconds: 20
+          periodSeconds: 3
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: user
