@@ -1,5 +1,6 @@
 package si.photos.by.d.user.api.v1.resources;
 
+import si.photos.by.d.user.models.dtos.Photo;
 import si.photos.by.d.user.models.entities.User;
 import si.photos.by.d.user.services.beans.UserBean;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class UserResources {
+public class UserResource {
     @Inject
     private UserBean userBean;
 
@@ -56,12 +57,11 @@ public class UserResources {
     public Response createCustomer(User user) {
 
         if ((user.getFirstName() == null || user.getFirstName().isEmpty()) || (user.getLastName() == null
-                || user.getLastName().isEmpty())) {
+                || user.getLastName().isEmpty()) || (user.getEmail() == null || user.getEmail().isEmpty())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
             user = userBean.createUser(user);
         }
-        //TODO check if email exists
         if (user.getId() != null) {
             return Response.status(Response.Status.CREATED).entity(user).build();
         } else {
@@ -71,7 +71,7 @@ public class UserResources {
 
     @PUT
     @Path("{userId}")
-    public Response putZavarovanec(@PathParam("userId") Integer userId, User user) {
+    public Response updateUser(@PathParam("userId") Integer userId, User user) {
 
         user = userBean.updateUser(userId, user);
 
