@@ -29,5 +29,5 @@ kumuluzee:
       url-pattern: /v1/users/*
 app-properties:
   external-services:
-    enabled: false
+    enabled: true
   healthy: true

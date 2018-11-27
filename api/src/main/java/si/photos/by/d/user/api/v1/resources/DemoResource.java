@@ -23,7 +23,7 @@ public class DemoResource {
                 .add("opis_projekta", "Projekt implementira aplikacijo, ki uporabnikom dovoljuje nalaganje" +
                         "fotografij na splet, z njimi tvoriti albume, dodajati komentarje pod slike, jih deliti z drugimi" +
                         " ...")
-                .add("mikrostoritve", Json.createArrayBuilder().add(""))
+                .add("mikrostoritve", Json.createArrayBuilder().add("http://159.122.187.8:31389/v1/users").add("http://159.122.187.8:31124/v1/photos"))
                 .add("github", Json.createArrayBuilder().add("https://github.com/PhotosByD/user-management-service").add("https://github.com/PhotosByD/photo-management-service"))
                 .add("travis", Json.createArrayBuilder().add("https://travis-ci.org/PhotosByD/user-management-service").add("https://travis-ci.org/PhotosByD/photo-management-service"))
                 .add("dockerhub", Json.createArrayBuilder().add("https://hub.docker.com/r/photosbyd/user-service/").add("https://hub.docker.com/r/photosbyd/photo-service/"))
