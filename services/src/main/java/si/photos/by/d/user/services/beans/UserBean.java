@@ -3,6 +3,9 @@ package si.photos.by.d.user.services.beans;
 import com.kumuluz.ee.discovery.annotations.DiscoverService;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import si.photos.by.d.user.models.dtos.Album;
 import si.photos.by.d.user.models.dtos.Photo;
@@ -23,6 +26,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -54,7 +59,7 @@ public class UserBean {
         //photoUrl = "http://localhost:8081"; // only for demonstration
     }
 
-    @Timed
+
     public List<User> getUsers() {
         TypedQuery<User> query = em.createNamedQuery("User.getAll", User.class);
         return query.getResultList();
@@ -148,6 +153,10 @@ public class UserBean {
             em.getTransaction().rollback();
     }
 
+    @Timed
+    @CircuitBreaker(requestVolumeThreshold = 3)
+    @Timeout(value = 2, unit = ChronoUnit.SECONDS)
+    @Fallback(fallbackMethod = "getPhotosFallback")
     private List<Photo> getPhotosForUser(Integer userId) {
         if (appProperties.isExternalServicesEnabled() && photoUrl.isPresent()) {
             try {
@@ -161,6 +170,10 @@ public class UserBean {
             }
         }
         return null;
+    }
+
+    public List<Photo> getPhotosFallback(Integer userId) {
+        return Collections.emptyList();
     }
 
     private List<Album> getAlbumsForUser(Integer userId) {

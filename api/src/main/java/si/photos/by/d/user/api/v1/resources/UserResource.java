@@ -1,10 +1,10 @@
 package si.photos.by.d.user.api.v1.resources;
 
-import si.photos.by.d.user.models.dtos.Photo;
+import com.kumuluz.ee.logs.cdi.Log;
 import si.photos.by.d.user.models.entities.User;
 import si.photos.by.d.user.services.beans.UserBean;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -13,7 +13,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
-@RequestScoped
+@Log
+@ApplicationScoped
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
