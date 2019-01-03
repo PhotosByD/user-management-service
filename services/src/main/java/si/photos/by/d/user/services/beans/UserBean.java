@@ -175,7 +175,14 @@ public class UserBean {
     public List<Photo> getPhotosFallback(Integer userId) {
         return Collections.emptyList();
     }
+    public List<Album> getAlbumsFallback(Integer userId) {
+        return Collections.emptyList();
+    }
 
+    @Timed
+    @CircuitBreaker(requestVolumeThreshold = 3)
+    @Timeout(value = 2, unit = ChronoUnit.SECONDS)
+    @Fallback(fallbackMethod = "getAlbumsFallback")
     private List<Album> getAlbumsForUser(Integer userId) {
         if (albumUrl.isPresent()) {
             try {
