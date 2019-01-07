@@ -13,7 +13,7 @@ import si.photos.by.d.user.models.entities.User;
 import si.photos.by.d.user.services.configuration.AppProperties;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -24,7 +24,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -32,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-@RequestScoped
+@ApplicationScoped
 public class UserBean {
     private Logger log = Logger.getLogger(UserBean.class.getName());
 

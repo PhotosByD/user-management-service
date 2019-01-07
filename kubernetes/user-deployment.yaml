@@ -13,7 +13,7 @@ spec:
         app: user
     spec:
       containers:
-      - image: photosbyd/user-service:0.10
+      - image: photosbyd/user-service:0.11
         name: user
         env:
         - name: KUMULUZEE_DISCOVERY_CLUSTER
@@ -23,7 +23,7 @@ spec:
         - name: KUMULUZEE_CONFIG_ETCD_HOSTS
           value: http://etcd:2379
         - name: KUMULUZEE_SERVER_BASEURL
-          value: http://159.122.187.8:31389
+          value: http://159.122.179.27:31784
         - name: KUMULUZEE_DATASOURCES0_PASSWORD
           valueFrom:
             secretKeyRef:
