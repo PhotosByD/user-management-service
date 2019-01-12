@@ -14,6 +14,7 @@ import si.photos.by.d.user.services.configuration.AppProperties;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -25,13 +26,15 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriInfo;
+import java.lang.reflect.Array;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-@ApplicationScoped
+@RequestScoped
 public class UserBean {
     private Logger log = Logger.getLogger(UserBean.class.getName());
 
@@ -40,6 +43,9 @@ public class UserBean {
 
     @Inject
     private AppProperties appProperties;
+
+    @Inject
+    private UserBean userBean;
 
     private Client httpClient;
 
@@ -53,9 +59,7 @@ public class UserBean {
 
     @PostConstruct
     private void init() {
-        // This here will connect to photo service and get me photos for user
         httpClient = ClientBuilder.newClient();
-        //photoUrl = "http://localhost:8081"; // only for demonstration
     }
 
 
@@ -78,11 +82,12 @@ public class UserBean {
         if (user == null) {
             throw new NotFoundException();
         }
+        List<Photo> photos = userBean.getPhotosForUser(userId);
+        if(photos != null) {
+            user.setPhotos(photos);
+        }
 
-        List<Photo> photos = getPhotosForUser(userId);
-        user.setPhotos(photos);
-
-        List<Album> albums = getAlbumsForUser(userId);
+        List<Album> albums = userBean.getAlbumsForUser(userId);
         user.setAlbums(albums);
 
         return user;
@@ -153,10 +158,10 @@ public class UserBean {
     }
 
     @Timed
-    @CircuitBreaker(requestVolumeThreshold = 3)
+    @CircuitBreaker(requestVolumeThreshold = 1)
     @Timeout(value = 2, unit = ChronoUnit.SECONDS)
     @Fallback(fallbackMethod = "getPhotosFallback")
-    private List<Photo> getPhotosForUser(Integer userId) {
+    public List<Photo> getPhotosForUser(Integer userId) {
         if (appProperties.isExternalServicesEnabled() && photoUrl.isPresent()) {
             try {
                 return httpClient
@@ -172,17 +177,20 @@ public class UserBean {
     }
 
     public List<Photo> getPhotosFallback(Integer userId) {
-        return Collections.emptyList();
+        Photo photo = new Photo();
+        photo.setTitle("This is default photo");
+        photo.setPhotoURL("Test");
+        return Collections.singletonList(photo);
     }
     public List<Album> getAlbumsFallback(Integer userId) {
         return Collections.emptyList();
     }
 
     @Timed
-    @CircuitBreaker(requestVolumeThreshold = 3)
+    @CircuitBreaker(requestVolumeThreshold = 1)
     @Timeout(value = 2, unit = ChronoUnit.SECONDS)
     @Fallback(fallbackMethod = "getAlbumsFallback")
-    private List<Album> getAlbumsForUser(Integer userId) {
+    public List<Album> getAlbumsForUser(Integer userId) {
         if (albumUrl.isPresent()) {
             try {
                 return httpClient
